@@ -1,13 +1,13 @@
 package com.java.demonotes.presentation
 
+import android.content.DialogInterface
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -44,6 +44,11 @@ class NoteFragment : Fragment() {
         // Inflate the layout for this fragment
         rootview = inflater.inflate(R.layout.fragment_note, container, false)
         return rootview
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -104,6 +109,37 @@ class NoteFragment : Fragment() {
                 currentNote = note
             }
         }
+
+        viewModel.removed.observe(viewLifecycleOwner){
+            if(it){
+                context?.showMessage("Successfully removed!!")
+                Navigation.findNavController(titleView).popBackStack()
+            }else{
+                context?.showMessage("Failed to remove!!")
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.note_menu,menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.deleteNote->{
+                if(context != null && currentNote.id != 0L){
+                 AlertDialog.Builder(requireContext())
+                     .setTitle("Delete Note")
+                     .setMessage("Sre you sure you to delete the note ?")
+                     .setPositiveButton("Yes", DialogInterface.OnClickListener { dialogInterface, i -> viewModel.deleteNote(currentNote) })
+                     .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialogInterface, i ->  dialogInterface.dismiss()})
+                     .create()
+                     .show()
+                }
+            }
+        }
+        return true
     }
 
 }

@@ -26,6 +26,8 @@ class NoteViewModel(
     )
 
     val saved = MutableLiveData<Boolean>()
+    val removed = MutableLiveData<Boolean>()
+
 
     val currentNote = MutableLiveData<Note?>()
 
@@ -39,6 +41,13 @@ class NoteViewModel(
     fun getNote(id:Long) = coroutineScope.launch {
         val note = useCases.getNote(id)
         currentNote.postValue(note)
+    }
+
+    fun deleteNote(note:Note){
+        coroutineScope.launch {
+            useCases.removeNote(note)
+            removed.postValue(true)
+        }
     }
 
 
