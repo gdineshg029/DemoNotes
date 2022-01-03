@@ -20,11 +20,6 @@ import com.java.demonotes.R
 import com.java.demonotes.framework.NoteViewModel
 import com.java.demonotes.showMessage
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
 /**
  * A simple [Fragment] subclass.
  * Use the [NoteFragment.newInstance] factory method to
@@ -35,7 +30,7 @@ class NoteFragment : Fragment() {
     private lateinit var viewModel: NoteViewModel
     private var currentNote = Note("","",0L,0L)
 
-    private val id:Long by navArgs()
+    private val args: NoteFragmentArgs by navArgs()
     private lateinit var rootview : View
     private lateinit var checkButton:FloatingActionButton
     private lateinit var titleView:EditText
@@ -53,6 +48,7 @@ class NoteFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
         rootview?.apply {
@@ -73,6 +69,10 @@ class NoteFragment : Fragment() {
                         currentNote.creationTime = time
                     }
                     viewModel.savedNote(currentNote)
+                    /*else{
+                        viewModel.updateNote(currentNote)
+                    }*/
+
                 }else {
                     Navigation.findNavController(it).popBackStack()
                 }
@@ -80,8 +80,13 @@ class NoteFragment : Fragment() {
         }
 
         observeViewModel()
+        getCurrentNote()
     }
 
+    private fun getCurrentNote(){
+        if(args.noteIF != 0L)
+            viewModel.getNote(args.noteIF)
+    }
     private fun observeViewModel(){
         viewModel.saved.observe(viewLifecycleOwner, Observer {
             if(it) {
@@ -91,6 +96,14 @@ class NoteFragment : Fragment() {
                 context?.showMessage("Failed to save!!!")
             }
         })
+
+        viewModel.currentNote.observe(viewLifecycleOwner){
+            it?.let{note->
+                titleView.setText(note.title,TextView.BufferType.EDITABLE)
+                contentView.setText(note.content,TextView.BufferType.EDITABLE)
+                currentNote = note
+            }
+        }
     }
 
 }

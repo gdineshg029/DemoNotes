@@ -5,11 +5,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.java.demonotes.R
+import com.java.demonotes.framework.ListViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,12 +25,14 @@ private const val ARG_PARAM2 = "param2"
  * Use the [ListFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ListFragment : Fragment() {
+class ListFragment : Fragment(),ListAction {
 
     private lateinit var rootView: View
     private lateinit var notesListView: RecyclerView
     private lateinit var addNote:FloatingActionButton
-
+    private lateinit var listViewModel: ListViewModel
+    private lateinit var loadingView: ProgressBar
+    private lateinit var notesListAdapter: NotesListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,35 +46,49 @@ class ListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        listViewModel = ViewModelProviders.of(this).get(ListViewModel::class.java)
+
         notesListView = rootView.findViewById(R.id.notesListView)
         addNote = rootView.findViewById(R.id.addNote)
+        loadingView = rootView.findViewById(R.id.loadingView)
 
         addNote.setOnClickListener{
             goToNoteDetails()
         }
+
+        initNoteRecyclerView()
+        observeUpdates()
     }
 
+    override fun onResume() {
+        super.onResume()
+        listViewModel.getAllNotes()
+    }
+
+    private fun initNoteRecyclerView(){
+        notesListAdapter = NotesListAdapter(arrayListOf(),this)
+        notesListView.apply {
+            layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
+            adapter = notesListAdapter
+        }
+    }
+
+    private fun observeUpdates(){
+        listViewModel.notes.observe(viewLifecycleOwner){
+            loadingView.visibility =View.GONE
+            notesListView.visibility = View.VISIBLE
+            notesListAdapter.updateNotes(it.sortedBy { it.updateTime })
+        }
+    }
     private fun goToNoteDetails(id:Long = 0L){
         val action = ListFragmentDirections.actionGoToNoteFragment(id)
         Navigation.findNavController(notesListView).navigate(action)
     }
-    /*companion object {
-        *//**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ListFragment.
-         *//*
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ListFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }*/
+
+    override fun onClick(id: Long) {
+        goToNoteDetails(id)
+    }
+
 }

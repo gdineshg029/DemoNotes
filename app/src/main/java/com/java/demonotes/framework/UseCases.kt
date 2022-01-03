@@ -1,9 +1,6 @@
 package com.java.demonotes.framework
 
-import com.java.core.usecase.AddNote
-import com.java.core.usecase.GetAllNotes
-import com.java.core.usecase.GetNote
-import com.java.core.usecase.RemoveNote
+import com.java.core.usecase.*
 
 data class UseCases(
     val addNote:AddNote,
