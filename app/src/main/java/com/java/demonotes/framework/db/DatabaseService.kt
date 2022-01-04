@@ -11,16 +11,6 @@ abstract class DatabaseService :RoomDatabase(){
     abstract fun noteDao() : NoteDao
 
     companion object{
-        private const val DATABASE_NAME = "note.db"
-
-        private var instance: DatabaseService? = null
-
-        fun getInstance(context: Context): DatabaseService =
-            (instance ?: create(context)).also { instance = it }
-
-        private fun create(context: Context): DatabaseService =
-            Room.databaseBuilder(context, DatabaseService::class.java, DATABASE_NAME)
-                .fallbackToDestructiveMigration()
-                .build()
+        const val DATABASE_NAME = "note.db"
     }
 }

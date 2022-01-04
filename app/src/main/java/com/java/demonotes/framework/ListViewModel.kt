@@ -3,24 +3,26 @@ package com.java.demonotes.framework
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import com.java.core.data.Note
 import com.java.core.repository.NoteRepository
 import com.java.core.usecase.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ListViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class ListViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
-    val coroutineScope = CoroutineScope(Dispatchers.IO)
-    val repository = NoteRepository(RoomNoteDataSource(application))
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    val useCases = UseCases(
-        addNote = AddNote(repository),
-        getAllNotes = GetAllNotes(repository),
-        getNote = GetNote(repository),
-        removeNote = RemoveNote(repository)
-    )
+    @Inject
+    lateinit var useCases:UseCases
 
     val notes = MutableLiveData<List<Note>>()
 

@@ -4,19 +4,21 @@ buildscript {
     ext.coroutines_version = "1.3.0"
     ext.room_version = "2.2.2"
     ext.glide_version = "4.8.0"
-    ext.nav_version = "2.1.0"
+    ext.nav_version = "2.3.5"
     ext.daggerVersion = "2.14.1"
 
 
     repositories {
         google()
         jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:4.1.1"
+        classpath "com.android.tools.build:gradle:7.0.3"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
 
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.40.5'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -26,6 +28,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        mavenCentral()
     }
 }
 

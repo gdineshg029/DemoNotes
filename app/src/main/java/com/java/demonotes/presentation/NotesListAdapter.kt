@@ -8,12 +8,12 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.java.core.data.Note
 import com.java.demonotes.R
-import org.w3c.dom.Text
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
-class NotesListAdapter(var notes:ArrayList<Note>,val action: ListAction) : RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>(){
+class NotesListAdapter(var notes:ArrayList<Note>) : RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>(){
+
+    lateinit var action: ListAction
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_note,parent,false)
@@ -21,7 +21,7 @@ class NotesListAdapter(var notes:ArrayList<Note>,val action: ListAction) : Recyc
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-      holder.bind(note = notes[position])
+        holder.bind(note = notes[position])
     }
 
     override fun getItemCount() = notes.size
@@ -45,7 +45,9 @@ class NotesListAdapter(var notes:ArrayList<Note>,val action: ListAction) : Recyc
                 content.text = note.content
                 lastUpdated.text = convertToDateString(note.updateTime)
                 noteLayout.setOnClickListener{
-                    action.onClick(note.id)
+                    if(::action.isInitialized) {
+                        action.onClick(note.id)
+                    }
                 }
             }
         }
